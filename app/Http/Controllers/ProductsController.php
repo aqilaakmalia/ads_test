@@ -53,7 +53,6 @@ class ProductsController extends Controller
 
     public function store(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'category_id' => 'required',
             'name' => 'required',
@@ -70,9 +69,6 @@ class ProductsController extends Controller
             ],401);
 
         } else {
-            $image = $request->file('image');
-            $image->storeAs('public/image/', $image->getClientOriginalName());
-
             $post = Products::create([ 
                 'category_id' => $request->input('category_id'), 
                 'name' => $request->input('name'), 
@@ -80,12 +76,30 @@ class ProductsController extends Controller
                 'price' => $request->input('price'), 
             ]);
 
-            $asset = ProductAssets::create([
-                'product_id' => $post->id, 
-                'image' => $image->getClientOriginalName() 
-            ]);
+            // $image = $request->file('image');
+            // $image->storeAs('public/image/', $image->getClientOriginalName());
 
-            if ($post && $asset) {
+            $data = [];
+            if($files = $request->file('image')){
+                foreach($files as $file)
+                {
+                    $name = $file->getClientOriginalName();
+                    $file->storeAs('public/asset/', $name);
+                    $data[] = $name;
+                }
+            }  
+
+            $upload_file = new ProductAssets();
+            $upload_file->product_id = $post->id;
+            $upload_file->image = json_encode($data);
+            $upload_file->save();
+
+            // ProductAssets::create([
+            //     'product_id' => $post->id, 
+            //     'image' => implode("|",$data),
+            // ]);
+
+            if ($post) {
                 return response()->json([
                     'success' => true,
                     'message' => 'Upload Product Successful',
