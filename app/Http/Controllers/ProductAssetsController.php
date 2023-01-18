@@ -46,12 +46,12 @@ class ProductAssetsController extends Controller
             if ($post) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Upload Product Successful',
+                    'message' => 'Upload Asset Successful',
                 ], 200);
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Upload Product Failed',
+                    'message' => 'Upload Asset Failed',
                 ], 401);
             }
         }
